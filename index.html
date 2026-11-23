@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Оплата занятий — Джураев Муслим</title>
+
+<style>
+:root {
+    --bg: #f5f2ec;
+    --card: #ffffff;
+    --accent: #86735d;
+    --accent-dark: #6d5b48;
+    --text: #39352f;
+    --muted: #8e857a;
+    --border: #e9e3da;
+    --soft: #f0ece6;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+button, input {
+    font-family: inherit;
+    font-size: inherit;
+}
+
+button {
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.container {
+    width: 100%;
+    max-width: 1000px;
+    margin: auto;
+    padding: 20px 16px 60px;
+}
+
+.header {
+    text-align: center;
+    padding: 40px 10px 30px;
+}
+
+.header h1 {
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--accent-dark);
+    margin: 0;
+}
+
+.header p {
+    color: var(--muted);
+    font-size: 14px;
+    margin-top: 12px;
+}
+
+.card {
+    background: var(--card);
+    border-radius: 22px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 20px rgba(70, 50, 30, 0.035);
+}
+
+.title {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 22px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.field {
+    margin-bottom: 16px;
+}
+
+.field label {
+    display: block;
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.field input {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid var(--border);
+    background: #fbfaf8;
+    border-radius: 12px;
+    outline: none;
+}
+
+.field input:focus {
+    border-color: #b7a48e;
+}
+
+.calendar-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+.calendar-top button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 12px;
+    background: var(--soft);
+    color: var(--accent-dark);
+    font-size: 22px;
+}
+
+.month-name {
+    font-weight: 600;
+    font-size: 17px;
+}
+
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 7px;
+}
+
+.weekday {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    padding: 8px 0;
+}
+
+.day {
+    height: 45px;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    background: #faf9f7;
+    color: var(--text);
+}
+
+.day:hover {
+    background: #eee8df;
+}
+
+.day.selected {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}
+
+.day.empty {
+    visibility: hidden;
+}
+
+.day.today {
+    border: 2px solid #c4ad92;
+}
+
+.day.selected.today {
+    border: 2px solid #d8c4ab;
+}
+
+.hint {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+    margin-top: 15px;
+}
+
+.summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.summary-box {
+    background: var(--bg);
+    border-radius: 15px;
+    padding: 18px 10px;
+    text-align: center;
+}
+
+.summary-box span {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 8px;
+}
+
+.summary-box strong {
+    font-size: 20px;
+    color: var(--accent-dark);
+}
+
+.qr-area {
+    text-align: center;
+    padding: 25px;
+    border: 2px dashed var(--border);
+    border-radius: 17px;
+}
+
+.qr-upload {
+    display: inline-block;
+    padding: 13px 18px;
+    background: var(--soft);
+    color: var(--accent-dark);
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+#qrInput {
+    display: none;
+}
+
+.qr-preview img {
+    max-width: 240px;
+    max-height: 300px;
+    object-fit: contain;
+    display: block;
+    margin: 20px auto 0;
+    border-radius: 12px;
+}
+
+.buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.btn {
+    border: none;
+    border-radius: 12px;
+    padding: 14px 18px;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--accent-dark);
+}
+
+.btn-secondary {
+    background: var(--soft);
+    color: var(--text);
+}
+
+.btn-danger {
+    background: #f8e8e5;
+    color: #a04e42;
+}
+
+.student-card {
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.student-card h3 {
+    margin: 0 0 12px;
+    font-size: 18px;
+}
+
+.student-info {
+    color: var(--muted);
+    line-height: 1.8;
+    font-size: 14px;
+}
+
+.student-total {
+    font-size: 23px;
+    font-weight: 600;
+    color: var(--accent-dark);
+    margin: 18px 0;
+}
+
+.student-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 30px 10px;
+    color: var(--muted);
+}
+
+.footer {
+    text-align: center;
+    font-size: 12px;
+    color: #a69b8d;
+    margin-top: 30px;
+}
+
+@media(max-width:600px) {
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .card {
+        padding: 20px;
+    }
+
+    .header h1 {
+        font-size: 23px;
+    }
+
+    .summary {
+        grid-template-columns: 1fr;
+    }
+
+    .summary-box {
+        padding: 15px;
+    }
+
+    .day {
+        height: 40px;
+    }
+}
+
+/* Печатная карточка родителя */
+
+@media print {
+    body {
+        background: white;
+    }
+
+    body * {
+        visibility: hidden;
+    }
+
+    #printCard, #printCard * {
+        visibility: visible;
+    }
+
+    #printCard {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        max-width: 700px;
+        margin: auto;
+        padding: 35px;
+        background: white;
+        color: #39352f;
+    }
+
+    .print-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .print-header h1 {
+        font-size: 23px;
+        font-weight: 600;
+        line-height: 1.5;
+    }
+
+    .print-subtitle {
+        color: #888;
+        font-size: 14px;
+    }
+
+    .print-info {
+        margin-top: 30px;
+    }
+
+    .print-info div {
+        padding: 15px 0;
+        border-bottom: 1px solid #eee;
+        font-size: 16px;
+    }
+
+    .print-info span {
+        color: #888;
+    }
+
+    .print-total {
+        background: #f5f2ec;
+        text-align: center;
+        padding: 25px;
+        margin-top: 25px;
+        border-radius: 15px;
+    }
+
+    .print-total h2 {
+        font-size: 32px;
+        margin: 10px 0 0;
+    }
+
+    .print-qr {
+        text-align: center;
+        margin-top: 30px;
+    }
+
+    .print-qr img {
+        max-width: 260px;
+        max-height: 320px;
+    }
+
+    .print-footer {
+        text-align: center;
+        color: #888;
+        font-size: 13px;
+        margin-top: 30px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header class="header">
+    <h1>Сайт по оплате курсовых занятий<br>Джураева Муслима</h1>
+    <p>Учёт занятий и оплаты</p>
+</header>
+
+<section class="card">
+    <h2 class="title">Информация об ученике</h2>
+
+    <div class="grid">
+        <div class="field">
+            <label>Имя ученика</label>
+            <input id="studentName" placeholder="Имя ученика">
+        </div>
+
+        <div class="field">
+            <label>Имя родителя</label>
+            <input id="parentName" placeholder="Имя родителя">
+        </div>
+
+        <div class="field">
+            <label>Имя преподавателя</label>
+            <input id="teacherName" value="Джураев Муслим">
+        </div>
+
+        <div class="field">
+            <label>Стоимость одного занятия (сом)</label>
+            <input id="lessonPrice" type="number" min="0" placeholder="500">
+        </div>
+    </div>
+</section>
+
+<section class="card">
+    <h2 class="title">Календарь занятий</h2>
+
+    <div class="calendar-top">
+        <button onclick="changeMonth(-1)">‹</button>
+        <div class="month-name" id="monthName"></div>
+        <button onclick="changeMonth(1)">›</button>
+    </div>
+
+    <div class="calendar" id="calendar"></div>
+
+    <p class="hint">
+        Нажимай на даты занятий. Выбранные даты будут отмечены цветом.
+    </p>
+
+    <div class="summary">
+        <div class="summary-box">
+            <span>Количество занятий</span>
+            <strong id="count">0</strong>
+        </div>
+
+        <div class="summary-box">
+            <span>Стоимость занятия</span>
+            <strong id="price">0 сом</strong>
+        </div>
+
+        <div class="summary-box">
+            <span>Итого за месяц</span>
+            <strong id="total">0 сом</strong>
+        </div>
+    </div>
+</section>
+
+<section class="card">
+    <h2 class="title">QR-код для оплаты</h2>
+
+    <div class="qr-area">
+        <label class="qr-upload" for="qrInput">
+            📷 Загрузить QR-код
+        </label>
+
+        <input type="file" id="qrInput" accept="image/*">
+
+        <div id="qrPreview" class="qr-preview"></div>
+
+        <p class="hint">
+            Загрузи фотографию QR-кода своего банка.
+        </p>
+    </div>
+</section>
+
+<section class="card">
+    <div class="buttons">
+        <button class="btn btn-primary" onclick="saveStudent()">
+            💾 Сохранить карточку
+        </button>
+
+        <button class="btn btn-secondary" onclick="clearForm()">
+            ＋ Новая карточка
+        </button>
+    </div>
+
+    <p id="message" class="hint"></p>
+</section>
+
+<section class="card">
+    <h2 class="title">Сохранённые карточки</h2>
+    <div id="studentsList"></div>
+</section>
+
+<footer class="footer">
+    Джураев Муслим · Учёт курсовых занятий
+</footer>
+
+</div>
+
+<!-- Печатная карточка -->
+
+<div id="printCard" style="display:none"></div>
+
+<script>
+const STORAGE_KEY = "muslim_payment_cards_v1";
+
+let students = [];
+
+try {
+    students = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+} catch {
+    students = [];
+}
+
+let selectedDates = [];
+let qrImage = "";
+
+let calendarDate = new Date();
+calendarDate.setDate(1);
+
+const monthNames = [
+    "Январь", "Февраль", "Март", "Апрель",
+    "Май", "Июнь", "Июль", "Август",
+    "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+];
+
+const weekdays = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+
+function money(value) {
+    return Number(value || 0).toLocaleString("ru-RU") + " сом";
+}
+
+function saveStorage() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
+}
+
+function renderCalendar() {
+    const calendar = document.getElementById("calendar");
+    calendar.innerHTML = "";
+
+    document.getElementById("monthName").textContent =
+        monthNames[calendarDate.getMonth()] + " " +
+        calendarDate.getFullYear();
+
+    weekdays.forEach(day => {
+        const el = document.createElement("div");
+        el.className = "weekday";
+        el.textContent = day;
+        calendar.appendChild(el);
+    });
+
+    const year = calendarDate.getFullYear();
+    const month = calendarDate.getMonth();
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const offset = (firstDay + 6) % 7;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    for (let i = 0; i < offset; i++) {
+        const empty = document.createElement("div");
+        empty.className = "day empty";
+        calendar.appendChild(empty);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dateKey =
+            year + "-" +
+            String(month + 1).padStart(2, "0") + "-" +
+            String(day).padStart(2, "0");
+
+        const button = document.createElement("button");
+        button.className = "day";
+        button.textContent = day;
+
+        if (selectedDates.includes(dateKey)) {
+            button.classList.add("selected");
+        }
+
+        const today = new Date();
+
+        if (
+            today.getFullYear() === year &&
+            today.getMonth() === month &&
+            today.getDate() === day
+        ) {
+            button.classList.add("today");
+        }
+
+        button.onclick = () => toggleDate(dateKey);
+
+        calendar.appendChild(button);
+    }
+}
+
+function toggleDate(dateKey) {
+    if (selectedDates.includes(dateKey)) {
+        selectedDates = selectedDates.filter(d => d !== dateKey);
+    } else {
+        selectedDates.push(dateKey);
+    }
+
+    updateSummary();
+    renderCalendar();
+}
+
+function changeMonth(direction) {
+    calendarDate.setMonth(calendarDate.getMonth() + direction);
+    renderCalendar();
+}
+
+function updateSummary() {
+    const price = Number(document.getElementById("lessonPrice").value || 0);
+    const count = selectedDates.length;
+    const total = count * price;
+
+    document.getElementById("count").textContent = count;
+    document.getElementById("price").textContent = money(price);
+    document.getElementById("total").textContent = money(total);
+}
+
+document.getElementById("lessonPrice").addEventListener("input", updateSummary);
+
+document.getElementById("qrInput").addEventListener("change", function(event) {
+    const file = event.target.files[0];
+
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        qrImage = e.target.result;
+
+        document.getElementById("qrPreview").innerHTML =
+            `<img src="${qrImage}" alt="QR-код">`;
+    };
+
+    reader.readAsDataURL(file);
+});
+
+function saveStudent() {
+    const studentName = document.getElementById("studentName").value.trim();
+    const parentName = document.getElementById("parentName").value.trim();
+    const teacherName = document.getElementById("teacherName").value.trim();
+    const price = Number(document.getElementById("lessonPrice").value || 0);
+
+    if (!studentName || !parentName || !teacherName) {
+        alert("Заполни имя ученика, родителя и преподавателя.");
+        return;
+    }
+
+    if (selectedDates.length === 0) {
+        alert("Выбери хотя бы один день занятий в календаре.");
+        return;
+    }
+
+    if (price <= 0) {
+        alert("Укажи стоимость одного занятия.");
+        return;
+    }
+
+    const card = {
+        id: Date.now().toString(),
+        studentName,
+        parentName,
+        teacherName,
+        price,
+        dates: [...selectedDates],
+        count: selectedDates.length,
+        total: selectedDates.length * price,
+        qr: qrImage,
+        createdAt: new Date().toLocaleDateString("ru-RU")
+    };
+
+    students.unshift(card);
+
+    try {
+        saveStorage();
+    } catch (error) {
+        students.shift();
+        alert("Не удалось сохранить карточку. Возможно, QR-код слишком большой. Попробуй загрузить изображение меньшего размера.");
+        return;
+    }
+
+    renderStudents();
+    clearForm();
+
+    document.getElementById("message").textContent =
+        "Карточка успешно сохранена!";
+}
+
+function clearForm() {
+    document.getElementById("studentName").value = "";
+    document.getElementById("parentName").value = "";
+    document.getElementById("teacherName").value = "Джураев Муслим";
+    document.getElementById("lessonPrice").value = "";
+
+    selectedDates = [];
+    qrImage = "";
+
+    document.getElementById("qrInput").value = "";
+    document.getElementById("qrPreview").innerHTML = "";
+
+    updateSummary();
+    renderCalendar();
+
+    document.getElementById("message").textContent = "";
+}
+
+function deleteStudent(id) {
+    const confirmDelete = confirm("Удалить эту карточку оплаты?");
+
+    if (!confirmDelete) return;
+
+    students = students.filter(student => student.id !== id);
+
+    saveStorage();
+    renderStudents();
+}
+
+function renderStudents() {
+    const list = document.getElementById("studentsList");
+
+    if (students.length === 0) {
+        list.innerHTML =
+            '<div class="empty-state">Пока нет сохранённых карточек.</div>';
+        return;
+    }
+
+    list.innerHTML = "";
+
+    students.forEach(student => {
+        const card = document.createElement("div");
+        card.className = "student-card";
+
+        card.innerHTML = `
+            <h3>${escapeHtml(student.studentName)}</h3>
+
+            <div class="student-info">
+                Родитель: ${escapeHtml(student.parentName)}<br>
+                Преподаватель: ${escapeHtml(student.teacherName)}<br>
+                Количество занятий: ${student.count}
+            </div>
+
+            <div class="student-total">
+                ${money(student.total)}
+            </div>
+
+            <div class="student-actions">
+                <button class="btn btn-primary"
+                    onclick="printStudent('${student.id}')">
+                    📄 Создать карточку родителю
+                </button>
+
+                <button class="btn btn-danger"
+                    onclick="deleteStudent('${student.id}')">
+                    🗑 Удалить
+                </button>
+            </div>
+        `;
+
+        list.appendChild(card);
+    });
+}
+
+function escapeHtml(value) {
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+function printStudent(id) {
+    const student = students.find(s => s.id === id);
+
+    if (!student) return;
+
+    const printCard = document.getElementById("printCard");
+
+    printCard.style.display = "block";
+
+    printCard.innerHTML = `
+        <div class="print-header">
+            <h1>Сайт по оплате курсовых занятий<br>
+            Джураева Муслима</h1>
+
+            <div class="print-subtitle">
+                Информация об оплате занятий
+            </div>
+        </div>
+
+        <div class="print-info">
+            <div>
+                <span>Имя ученика:</span>
+                <strong>${escapeHtml(student.studentName)}</strong>
+            </div>
+
+            <div>
+                <span>Имя родителя:</span>
+                <strong>${escapeHtml(student.parentName)}</strong>
+            </div>
+
+            <div>
+                <span>Имя преподавателя:</span>
+                <strong>${escapeHtml(student.teacherName)}</strong>
+            </div>
+
+            <div>
+                <span>Количество занятий:</span>
+                <strong>${student.count}</strong>
+            </div>
+        </div>
+
+        <div class="print-total">
+            <div>Сумма за месяц</div>
+            <h2>${money(student.total)}</h2>
+        </div>
+
+        ${student.qr ? `
+            <div class="print-qr">
+                <h3>QR-код для оплаты</h3>
+                <img src="${student.qr}">
+            </div>
+        ` : ""}
+
+        <div class="print-footer">
+            Джураев Муслим · Преподаватель
+        </div>
+    `;
+
+    window.print();
+
+    setTimeout(() => {
+        printCard.style.display = "none";
+    }, 500);
+}
+
+renderCalendar();
+updateSummary();
+renderStudents();
+</script>
+
+</body>
+</html>
